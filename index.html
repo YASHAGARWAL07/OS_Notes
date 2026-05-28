@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OS · Operating Systems — Study Notes</title>
+<meta name="description" content="Detailed, exam-ready notes for Operating Systems (OS) — B.Tech. Processes, IPC, synchronization, threads, memory management, virtual memory, deadlocks, disk scheduling, file systems & security.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%238a2b1e'/%3E%3Crect x='8' y='9' width='16' height='12' rx='1.6' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Cpath d='M12 24h8M16 21v3' stroke='%23fff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <button id="menu-btn" class="icon-btn" aria-label="Toggle menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="brand" href="#top">
+    <span class="brand-mark">
+      <svg viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="11" fill="var(--brand)"/><rect x="12" y="13" width="20" height="14" rx="2" fill="none" stroke="#fff" stroke-width="2.6"/><path d="M17 31h10M22 27v4" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span class="brand-text"><b>OS Notes</b><span>Operating Systems</span></span>
+  </a>
+  <div class="topbar-spacer"></div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+    <input id="search" type="text" placeholder="Search topics, definitions, keywords…" autocomplete="off" spellcheck="false">
+    <div class="search-results" id="search-results"></div>
+  </div>
+  <button id="theme-btn" class="icon-btn" aria-label="Toggle dark mode">
+    <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+    <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  </button>
+</header>
+
+<div class="progress-rail"><div class="progress-bar" id="progress"></div></div>
+<div class="scrim" id="scrim"></div>
+
+<div class="shell" id="top">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="nav-label">Unit I · Foundations</div>
+    <a class="nav-link" href="#intro"><span class="ni">①</span> Introduction to OS</a>
+    <a class="nav-link" href="#structure"><span class="ni">②</span> Structure &amp; Operations</a>
+    <a class="nav-link" href="#services"><span class="ni">③</span> Services &amp; System Calls</a>
+    <a class="nav-link" href="#process"><span class="ni">④</span> Processes &amp; Files</a>
+
+    <div class="nav-label">Unit I · Concurrency</div>
+    <a class="nav-link" href="#ipc"><span class="ni">⑤</span> Inter-Process Communication</a>
+    <a class="nav-link" href="#sockets"><span class="ni">⑥</span> IPC using Sockets</a>
+    <a class="nav-link" href="#sync"><span class="ni">⑦</span> Process Synchronization</a>
+    <a class="nav-link" href="#sync2"><span class="ni">⑧</span> Locks, Semaphores &amp; Monitors</a>
+    <a class="nav-link" href="#threads"><span class="ni">⑨</span> Threads &amp; Multithreading</a>
+    <a class="nav-link" href="#scheduling"><span class="ni">⑩</span> CPU Scheduling</a>
+
+    <div class="nav-label">Unit II · Memory</div>
+    <a class="nav-link" href="#memory"><span class="ni">⑪</span> Memory Management</a>
+    <a class="nav-link" href="#paging"><span class="ni">⑫</span> Paging &amp; Segmentation</a>
+    <a class="nav-link" href="#vm"><span class="ni">⑬</span> Virtual Memory &amp; Demand Paging</a>
+    <a class="nav-link" href="#replace"><span class="ni">⑭</span> Page Replacement &amp; Thrashing</a>
+
+    <div class="nav-label">Unit III · Deadlocks &amp; I/O</div>
+    <a class="nav-link" href="#deadlock"><span class="ni">⑮</span> Deadlocks</a>
+    <a class="nav-link" href="#disk"><span class="ni">⑯</span> Disk &amp; Storage Management</a>
+
+    <div class="nav-label">Unit IV · Files &amp; Security</div>
+    <a class="nav-link" href="#files"><span class="ni">⑰</span> File Management</a>
+    <a class="nav-link" href="#security"><span class="ni">⑱</span> Security &amp; Virtualization</a>
+  </aside>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="content">
+
+    <!-- HERO -->
+    <section class="hero reveal">
+      <span class="hero-eyebrow">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        B.Tech · Operating Systems · ESE 2026
+      </span>
+      <h1>Operating <em>Systems</em></h1>
+      <p class="hero-lede">A complete, exam-ready revision companion built directly from your lecture decks — every concept, definition, diagram and algorithm, organised the way you'll be tested. From the meaning of an OS through processes, IPC, synchronization, memory management, virtual memory, deadlocks, disk scheduling, files and security.</p>
+      <div class="hero-meta">
+        <span class="chip"><b>18</b> Topics</span>
+        <span class="chip"><b>4</b> Units</span>
+        <span class="chip"><b>400+</b> Slides distilled</span>
+        <span class="chip">📌 Keyword-faithful to your PPTs</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="num">4</div><div class="lbl">Components: Hardware · OS · Apps · Users</div></div>
+        <div class="stat"><div class="num">3</div><div class="lbl">CS Requirements: Mutual Exclusion · Progress · Bounded Wait</div></div>
+        <div class="stat"><div class="num">5</div><div class="lbl">Disk Algorithms: FCFS · SSTF · SCAN · C-SCAN · LOOK</div></div>
+        <div class="stat"><div class="num">2ⁿ</div><div class="lbl">Page size — a power of two between 512 B and 8 KB</div></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 1 — INTRODUCTION TO OPERATING SYSTEMS
+         ============================================================ -->
+    <section class="module" id="intro">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">1</span> Unit I · Foundations</div>
+        <h2>Introduction to Operating Systems</h2>
+        <p>What an operating system is, what goals it serves, the four components of a computer system, and the many roles the term "OS" covers — from toasters to spacecraft.</p>
+      </div>
+
+      <h3>What is an Operating System?</h3>
+      <p class="lead">An operating system is a <b>program that acts as an intermediary between a user of a computer and the computer hardware</b>.</p>
+
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">The Three Goals of an OS</span>
+        <b>Execute user programs</b> and make solving user problems easier · <b>Make the computer convenient</b> to use · <b>Use the hardware efficiently</b>.
+      </div>
+
+      <h3>Computer System Structure — Four Components</h3>
+      <p>A computer system can be divided into four components, each layered on the one below it:</p>
+      <div class="grid grid-4">
+        <div class="concept k-blue reveal"><div class="cnum">①</div><h4>Hardware</h4><p>Provides the basic computing resources — CPU, memory, and I/O devices.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">②</div><h4>Operating System</h4><p>Controls and coordinates the use of hardware among various applications and users.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">③</div><h4>Application Programs</h4><p>Define the ways system resources solve users' problems — word processors, compilers, browsers, databases, games.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">④</div><h4>Users</h4><p>People, machines, and other computers that use the system.</p></div>
+      </div>
+
+      <h3>What Operating Systems Do — A Matter of Viewpoint</h3>
+      <p>What an OS does depends on the point of view:</p>
+      <div class="grid grid-2">
+        <ul>
+          <li><b>Users</b> want convenience, ease of use and good performance — they don't care about resource utilization.</li>
+          <li><b>Shared computers</b> (mainframe/minicomputer) must keep all users happy — here the OS is a <b>resource allocator</b> and <b>control program</b>.</li>
+        </ul>
+        <ul>
+          <li><b>Dedicated systems</b> (workstations) have dedicated resources but use shared resources from servers.</li>
+          <li><b>Mobile devices</b> are resource-poor — optimized for usability and battery life, using touch screens and voice.</li>
+          <li><b>Embedded computers</b> (devices, automobiles) have little or no user interface and run without intervention.</li>
+        </ul>
+      </div>
+
+      <h3>Defining the Operating System</h3>
+      <div class="define reveal">
+        <span class="df-tag">No universally accepted definition</span>
+        <p>A good approximation: <em>"everything a vendor ships when you order an operating system"</em> — but this varies wildly.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">K</div><h4>Kernel</h4><p>The <b>one program running at all times</b> on the computer — the core of the OS.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">SP</div><h4>System Program</h4><p>Ships with the OS, but is <b>not part of the kernel</b>.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">AP</div><h4>Application Program</h4><p>All programs <b>not associated</b> with the operating system.</p></div>
+      </div>
+      <p>Modern general-purpose and mobile OSes also include <b>middleware</b> — a set of software frameworks providing additional services (databases, multimedia, graphics) to application developers.</p>
+
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Where OSes Live</span>
+        Operating systems are present in <b>toasters through ships, spacecraft, game machines, TVs and industrial control systems</b>. The OS was born when fixed-use military computers became general-purpose and needed resource management and program control.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 2 — STRUCTURE & OPERATIONS
+         ============================================================ -->
+    <section class="module" id="structure">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">2</span> Unit I · Foundations</div>
+        <h2>Computer-System Structure &amp; Operations</h2>
+        <p>How the hardware is organised, the central role of interrupts, the storage hierarchy, multiprocessor architectures, bootstrapping, multiprogramming vs multitasking, and dual-mode operation.</p>
+      </div>
+
+      <h3>Computer-System Organization</h3>
+      <p>One or more <b>CPUs</b> and <b>device controllers</b> connect through a <b>common bus</b> providing access to shared memory, executing concurrently and competing for memory cycles.</p>
+      <ul>
+        <li>Each <b>device controller</b> is in charge of a particular device type and has a <b>local buffer</b>.</li>
+        <li>Each controller type has an OS <b>device driver</b> to manage it.</li>
+        <li>The CPU moves data between main memory and local buffers; I/O is from the device to the controller's local buffer.</li>
+        <li>The controller informs the CPU it has finished by causing an <b>interrupt</b>.</li>
+      </ul>
+
+      <h3>Interrupts — The Heart of the OS</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-2 8 9-12h-7z" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        <span class="callout-title">An operating system is interrupt-driven</span>
+        An interrupt transfers control to the <b>interrupt service routine</b> via the <b>interrupt vector</b> (a table of service-routine addresses). The architecture must save the address of the interrupted instruction.
+      </div>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">Interrupt Handling</h4>
+          <ul>
+            <li>The OS <b>preserves the CPU state</b> by storing the registers and program counter.</li>
+            <li>It determines <b>which type of interrupt</b> occurred.</li>
+            <li>Separate segments of code decide the action for each type.</li>
+          </ul>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Traps &amp; Exceptions</h4>
+          <p>A <b>trap</b> (or exception) is a software-generated interrupt caused either by an <b>error</b> (e.g. division by zero) or a <b>user request</b> (a system call).</p>
+        </div>
+      </div>
+
+      <h3>I/O Structure &amp; DMA</h3>
+      <p>There are two methods for handling I/O after it starts:</p>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Synchronous (blocking)</h4>
+          <ul>
+            <li>Control returns to the user program <b>only upon I/O completion</b>.</li>
+            <li>A <b>wait</b> instruction idles the CPU until the next interrupt.</li>
+            <li>At most <b>one I/O request</b> outstanding at a time — no simultaneous processing.</li>
+          </ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Asynchronous</h4>
+          <ul>
+            <li>Control returns <b>without waiting</b> for I/O completion.</li>
+            <li>A <b>system call</b> lets the user wait for completion if desired.</li>
+            <li>A <b>device-status table</b> holds each device's type, address and state.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="define reveal">
+        <span class="df-tag">Direct Memory Access (DMA)</span>
+        <p>Used for high-speed I/O devices able to transmit near memory speed. The device controller transfers <b>blocks of data</b> directly from its buffer to main memory <b>without CPU intervention</b> — generating only <b>one interrupt per block</b> instead of one per byte.</p>
+      </div>
+
+      <h3>Storage Hierarchy</h3>
+      <p>Storage systems are organised in a hierarchy by <b>speed</b>, <b>cost</b> and <b>volatility</b>. <b>Caching</b> — copying information into faster storage — appears at every level; main memory can be viewed as a cache for secondary storage.</p>
+      <div class="grid grid-3">
+        <div class="concept k-orange reveal"><div class="cnum">▲</div><h4>Main Memory</h4><p>The only large storage the CPU can access directly. Random-access, typically <b>volatile DRAM</b>.</p></div>
+        <div class="concept k-blue reveal"><div class="cnum">HDD</div><h4>Hard Disk Drives</h4><p>Rigid platters with magnetic recording material; surface divided into <b>tracks</b> subdivided into <b>sectors</b>.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">NVM</div><h4>Non-Volatile Memory</h4><p>Faster than hard disks and nonvolatile — increasingly popular as capacity rises and price drops.</p></div>
+      </div>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Storage units</span>
+        The basic unit is the <b>bit</b> (0 or 1). A <b>byte</b> = 8 bits. A <b>word</b> is the architecture's native data unit (e.g. 8 bytes on a 64-bit machine). KB = 1,024 bytes; MB = 1,024² ; GB = 1,024³ ; TB = 1,024⁴ ; PB = 1,024⁵. Networking is the exception — measured in bits.
+      </div>
+
+      <h3>Computer-System Architecture</h3>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">Multiprocessor (Parallel) Systems</h4>
+          <p>Also called tightly-coupled systems. Advantages:</p>
+          <ul>
+            <li><b>Increased throughput</b></li>
+            <li><b>Economy of scale</b></li>
+            <li><b>Increased reliability</b> — graceful degradation / fault tolerance</li>
+          </ul>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Clustered Systems</h4>
+          <p>Multiple systems working together, usually sharing storage via a <b>SAN</b>, providing a high-availability service:</p>
+          <ul>
+            <li><b>Asymmetric</b> — one machine in hot-standby mode.</li>
+            <li><b>Symmetric</b> — multiple nodes running and monitoring each other.</li>
+            <li>Some are for <b>HPC</b>; some use a <b>distributed lock manager (DLM)</b>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Operating-System Operations</h3>
+      <div class="diagram reveal">
+        <div class="diagram-cap">Computer Startup → Operation</div>
+        <div class="flow">
+          <div class="flow-step"><div class="fs-num">1</div><div class="fs-body"><b>Bootstrap Program</b><span>Loaded at power-up from ROM/EPROM (firmware); initializes the system and loads the kernel.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">2</div><div class="fs-body"><b>Kernel Loads</b><span>Starts running, the one program present at all times.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">3</div><div class="fs-body"><b>System Daemons Start</b><span>Services provided outside the kernel begin running.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">4</div><div class="fs-body"><b>Interrupt-Driven Operation</b><span>The kernel waits and responds to hardware and software interrupts (traps).</span></div></div>
+        </div>
+      </div>
+
+      <h3>Multiprogramming vs Multitasking</h3>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Multiprogramming (Batch)</h4>
+          <ul>
+            <li>A single user cannot always keep the CPU and I/O devices busy.</li>
+            <li>Organizes jobs so the CPU <b>always has one to execute</b>.</li>
+            <li>A subset of jobs is kept in memory; one is run via <b>job scheduling</b>.</li>
+            <li>When a job must wait (e.g. for I/O), the OS switches to another job.</li>
+          </ul>
+        </div>
+        <div class="vs-mid">→</div>
+        <div class="vs-side right">
+          <h4>Multitasking (Timesharing)</h4>
+          <ul>
+            <li>The CPU switches jobs so frequently that users can <b>interact</b> with each — response time &lt; 1 second.</li>
+            <li>Several ready jobs ⟶ <b>CPU scheduling</b>.</li>
+            <li>If processes don't fit in memory, <b>swapping</b> moves them in and out.</li>
+            <li><b>Virtual memory</b> allows execution of processes not completely in memory.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Dual-Mode Operation</h3>
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — User Mode vs Kernel Mode</span>
+        A hardware <b>mode bit</b> distinguishes <b>user mode</b> from <b>kernel mode</b>, letting the OS protect itself. A <b>system call</b> changes the mode to kernel; the return resets it to user. <b>Privileged instructions</b> are executable only in kernel mode — so users cannot set the mode bit to "kernel" themselves.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 3 — OS SERVICES & SYSTEM CALLS
+         ============================================================ -->
+    <section class="module" id="services">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">3</span> Unit I · Foundations</div>
+        <h2>Operating System Services &amp; System Calls</h2>
+        <p>The services an OS provides to users and to itself, the user interfaces (CLI, GUI, touch), how system calls work, parameter passing, the types of system calls, and OS structures from monolithic to microkernel.</p>
+      </div>
+
+      <h3>Services Helpful to the User</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">UI</div><h4>User Interface</h4><p>CLI, GUI, touch-screen, or batch — almost every OS has one.</p></div>
+        <div class="concept k-blue reveal"><div class="cnum">PE</div><h4>Program Execution</h4><p>Load a program into memory and run it, ending normally or abnormally.</p></div>
+        <div class="concept k-blue reveal"><div class="cnum">I/O</div><h4>I/O Operations</h4><p>A running program may need I/O involving a file or a device.</p></div>
+        <div class="concept k-blue reveal"><div class="cnum">FS</div><h4>File-System Manipulation</h4><p>Read/write/create/delete/search files & directories, manage permissions.</p></div>
+        <div class="concept k-blue reveal"><div class="cnum">C</div><h4>Communications</h4><p>Processes exchange information via <b>shared memory</b> or <b>message passing</b>.</p></div>
+        <div class="concept k-blue reveal"><div class="cnum">ED</div><h4>Error Detection</h4><p>Constantly aware of errors in the CPU, memory, devices or user programs.</p></div>
+      </div>
+
+      <h3>Services for Efficient System Operation</h3>
+      <div class="grid grid-3">
+        <div class="concept k-green reveal"><div class="cnum">RA</div><h4>Resource Allocation</h4><p>Allocate CPU cycles, memory, file storage and devices among concurrent jobs.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">L</div><h4>Logging</h4><p>Track which users use how much of which resources.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">PS</div><h4>Protection &amp; Security</h4><p>Control access to resources; authenticate users; defend against outsiders.</p></div>
+      </div>
+
+      <h3>User Interfaces</h3>
+      <div class="grid grid-3">
+        <div class="concept reveal"><div class="cnum">⌨</div><h4>Command-Line (CLI)</h4><p>Allows direct command entry; implemented in the kernel or by a systems program. Multiple flavours called <b>shells</b> fetch a command and execute it.</p></div>
+        <div class="concept reveal"><div class="cnum">🖱</div><h4>GUI</h4><p>User-friendly desktop metaphor with icons, mouse and folders — invented at <b>Xerox PARC</b>. Windows is GUI + CLI; macOS is "Aqua" over a UNIX kernel.</p></div>
+        <div class="concept reveal"><div class="cnum">☝</div><h4>Touchscreen</h4><p>Gesture-based actions and a virtual keyboard; voice commands. No mouse.</p></div>
+      </div>
+
+      <h3>System Calls</h3>
+      <div class="define reveal">
+        <span class="df-tag">Definition</span>
+        <p>A system call is the <b>programming interface to the services provided by the OS</b>. Typically written in C/C++, they are mostly accessed by programs via a high-level <b>API</b> rather than directly.</p>
+      </div>
+      <p>The three most common APIs are <b>Win32 API</b> (Windows), <b>POSIX API</b> (UNIX, Linux, macOS), and the <b>Java API</b> (for the JVM).</p>
+
+      <h4>How a System Call Works</h4>
+      <ul>
+        <li>A <b>number is associated with each system call</b>; the interface maintains a table indexed by these numbers.</li>
+        <li>The interface invokes the intended call in the kernel and returns status and any values.</li>
+        <li>The caller need know nothing about the implementation — just the API. Details are hidden by the <b>run-time support library</b>.</li>
+      </ul>
+      <p>For example, a C program's <code>printf()</code> library call internally invokes the <code>write()</code> system call.</p>
+
+      <h4>Parameter Passing — Three Methods</h4>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">①</div><h4>In Registers</h4><p>Simplest — but there may be more parameters than registers.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">②</div><h4>In a Block / Table</h4><p>Parameters stored in memory; the block's address is passed in a register (used by <b>Linux & Solaris</b>).</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">③</div><h4>On the Stack</h4><p>Parameters pushed onto the stack by the program and popped by the OS.</p></div>
+      </div>
+
+      <h3>Types of System Calls</h3>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Category</th><th>Example Calls</th></tr></thead>
+          <tbody>
+            <tr><td>Process Control</td><td>create / terminate process, end, abort, load, execute, get/set attributes, wait & signal events, allocate & free memory</td></tr>
+            <tr><td>File Management</td><td>create / delete file, open, close, read, write, reposition, get & set file attributes</td></tr>
+            <tr><td>Device Management</td><td>request / release device, read, write, reposition, get & set device attributes, attach / detach devices</td></tr>
+            <tr><td>Information Maintenance</td><td>get / set time or date, get / set system data, get / set process, file or device attributes</td></tr>
+            <tr><td>Communications</td><td>create / delete connection, send & receive messages, transfer status, attach / detach remote devices</td></tr>
+            <tr><td>Protection</td><td>control access to resources, get & set permissions, allow & deny user access</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>UNIX/Linux Process-Control System Calls</h3>
+      <div class="grid grid-4">
+        <div class="concept k-blue reveal"><div class="cnum">fork</div><h4>fork()</h4><p>Creates a new <b>child process</b> as an (almost) exact duplicate of the parent — copies of stack, data, heap and text.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">exec</div><h4>exec()</h4><p>Replaces the process image with a new program.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">wait</div><h4>wait()</h4><p>Synchronizes parent and child — the parent waits for the child.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">exit</div><h4>exit()</h4><p>Terminates the process.</p></div>
+      </div>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Why fork() is useful</span>
+        A network server can <b>listen</b> for client requests and <b>fork a child to handle each one</b> while it continues listening — simplifying design and permitting greater concurrency.
+      </div>
+
+      <h3>Operating-System Structure</h3>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">Monolithic (Original UNIX)</h4>
+          <p>Limited structuring forced by hardware. Two separable parts — <b>system programs</b> and the <b>kernel</b> (everything below the system-call interface and above the hardware): file system, CPU scheduling, memory management and more, all in one level.</p>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Layered Approach</h4>
+          <p>The OS is divided into <b>layers</b> built on top of one another — layer 0 is hardware, layer N is the user interface. Each layer uses only the operations and services of <b>lower layers</b>.</p>
+        </div>
+      </div>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Microkernel (Mach)</h4>
+          <ul>
+            <li>Moves as much as possible <b>from the kernel into user space</b>.</li>
+            <li>Communication via <b>message passing</b>.</li>
+            <li>Benefits: easier to extend & port, more <b>reliable</b> and <b>secure</b> (less code in kernel mode).</li>
+            <li>Detriment: <b>performance overhead</b> of user↔kernel communication.</li>
+          </ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Modules &amp; Hybrid</h4>
+          <ul>
+            <li><b>Loadable kernel modules (LKMs)</b> — object-oriented, each loadable as needed (Linux, Solaris).</li>
+            <li>Most modern OSes are <b>hybrid</b>: Linux & Solaris are monolithic + modular; Windows is mostly monolithic + microkernel; macOS is hybrid/layered over a Mach + BSD core.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 4 — PROCESSES & FILES (File I/O System Calls)
+         ============================================================ -->
+    <section class="module" id="process">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">4</span> Unit I · Foundations</div>
+        <h2>Processes &amp; File I/O System Calls</h2>
+        <p>What a process is, the activities of process management, and the four low-level file I/O system calls — <code>open()</code>, <code>read()</code>, <code>write()</code> and <code>close()</code> — built on file descriptors.</p>
+      </div>
+
+      <h3>The Process</h3>
+      <div class="define reveal">
+        <span class="df-tag">Definition</span>
+        <p>A process is a <b>program in execution</b> — a unit of work within the system. A program is a <b>passive entity</b>; a process is an <b>active entity</b>. It needs resources (CPU, memory, I/O, files) to do its task, and termination requires reclaiming reusable resources.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">Single- vs Multi-threaded</h4>
+          <ul>
+            <li>A <b>single-threaded</b> process has one program counter, executing instructions sequentially until completion.</li>
+            <li>A <b>multi-threaded</b> process has one program counter <b>per thread</b>.</li>
+          </ul>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Process Management Activities</h4>
+          <ul>
+            <li>Creating & deleting user and system processes.</li>
+            <li>Suspending & resuming processes.</li>
+            <li>Mechanisms for <b>synchronization</b>, <b>communication</b> and <b>deadlock handling</b>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>File I/O System Calls</h3>
+      <p><code>open()</code>, <code>read()</code>, <code>write()</code> and <code>close()</code> are <b>low-level system calls</b> used to interact with files through <b>file descriptors</b>, defined in <code>unistd.h</code> and <code>fcntl.h</code>.</p>
+
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">File Descriptor (fd)</span>
+        A file descriptor is a <b>small integer identifying an open file</b>. Each process has its own descriptor table. Standard descriptors: <b>0 = stdin</b> (keyboard), <b>1 = stdout</b> (console), <b>2 = stderr</b>.
+      </div>
+
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Call</th><th>Syntax</th><th>Purpose &amp; Return</th></tr></thead>
+          <tbody>
+            <tr><td>open()</td><td><code>int fd = open(pathname, flags, mode)</code></td><td>Open/create a file and obtain a descriptor. Returns ≥ 0 on success, −1 on failure.</td></tr>
+            <tr><td>read()</td><td><code>ssize_t read(fd, buf, count)</code></td><td>Read bytes into a buffer. Returns bytes read (&gt;0), <b>0 at EOF</b>, −1 on error.</td></tr>
+            <tr><td>write()</td><td><code>ssize_t write(fd, buf, count)</code></td><td>Send data from a buffer to a file/device/pipe/socket. Returns bytes written or −1.</td></tr>
+            <tr><td>close()</td><td><code>int close(fd)</code></td><td>Release the descriptor and free kernel resources. Returns 0 on success, −1 on error.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Common open() Flags</h4>
+      <div class="pill-row">
+        <span class="pill"><b>O_RDONLY</b> read only</span>
+        <span class="pill"><b>O_WRONLY</b> write only</span>
+        <span class="pill"><b>O_RDWR</b> read &amp; write</span>
+        <span class="pill"><b>O_APPEND</b> write at end</span>
+        <span class="pill"><b>O_CREAT</b> create if absent</span>
+        <span class="pill"><b>O_EXCL</b> ensure file is new</span>
+        <span class="pill"><b>O_TRUNC</b> truncate existing</span>
+      </div>
+      <p><b>File permissions (mode)</b> use octal values for Owner / Group / Others — e.g. <code>0644</code> → <code>rw- r-- r--</code>. Each open file has a current position called the <b>offset</b>: reading <code>read(fd,buffer,5)</code> on "Hello World" returns "Hello", and the next read continues from where it left off.</p>
+
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — Return Values</span>
+        Remember the special return values: <code>read()</code> returns <b>0 at EOF</b>; <code>open()</code> returns <b>−1 on failure</b> (a valid fd is otherwise ≥ 0). <code>write(1, "Hello\n", 6)</code> prints to stdout.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 5 — INTER-PROCESS COMMUNICATION
+         ============================================================ -->
+    <section class="module" id="ipc">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">5</span> Unit I · Concurrency</div>
+        <h2>Inter-Process Communication (IPC)</h2>
+        <p>Independent vs cooperating processes, why processes cooperate, and the two fundamental IPC models — shared memory and message passing (pipes &amp; sockets).</p>
+      </div>
+
+      <h3>Independent vs Cooperating Processes</h3>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Independent</h4>
+          <ul><li><b>Cannot affect or be affected</b> by other processes.</li><li>Does <b>not share data</b> with any other process.</li></ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Cooperating</h4>
+          <ul><li><b>Can affect or be affected</b> by other processes.</li><li>Shares data and coordinates with others.</li></ul>
+        </div>
+      </div>
+
+      <h3>Why Processes Cooperate</h3>
+      <div class="grid grid-4">
+        <div class="concept k-blue reveal"><div class="cnum">IS</div><h4>Information Sharing</h4><p>Several users may want the same piece of information (e.g. a shared file).</p></div>
+        <div class="concept k-green reveal"><div class="cnum">CS</div><h4>Computation Speedup</h4><p>Break a task into subtasks running in parallel — only achievable with multiple cores.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">M</div><h4>Modularity</h4><p>Divide system functions into separate processes or threads.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">Cv</div><h4>Convenience</h4><p>An individual user works on many tasks at once — editing, music, compiling.</p></div>
+      </div>
+
+      <h3>Two Fundamental IPC Models</h3>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Shared Memory</h4>
+          <ul>
+            <li>A region of memory is <b>shared by cooperating processes</b>.</li>
+            <li>Processes exchange information by <b>reading and writing</b> to the shared region.</li>
+            <li>The region resides in the address space of the creating process; others must <b>attach</b> it to theirs.</li>
+          </ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Message Passing</h4>
+          <ul>
+            <li>Communication by <b>explicitly sending and receiving messages</b> through the OS kernel.</li>
+            <li>No direct access to a shared region.</li>
+            <li>Implemented via <b>pipes</b> and <b>sockets</b>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Shared-Memory POSIX System Calls</h3>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Call</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td>shm_open()</td><td>Create / open the shared-memory segment (Linux creates <code>/dev/shm/…</code>).</td></tr>
+            <tr><td>ftruncate()</td><td>Set the maximum size of the segment.</td></tr>
+            <tr><td>mmap()</td><td>Map process memory to the shared segment via a pointer — used to read & write.</td></tr>
+            <tr><td>munmap()</td><td>Unmap process memory after IPC.</td></tr>
+            <tr><td>shm_unlink()</td><td>Remove the shared memory.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="color:var(--c-green);margin-top:0">Pros of Shared Memory</h4>
+          <ul><li><b>Fastest</b> way of IPC.</li><li><b>No kernel copying</b> after <code>mmap</code>.</li><li>Efficient for <b>large data</b>.</li></ul>
+        </div>
+        <div class="card reveal">
+          <h4 style="color:var(--brand);margin-top:0">Cons of Shared Memory</h4>
+          <ul><li><b>No synchronization</b> — processes must coordinate access themselves.</li></ul>
+        </div>
+      </div>
+
+      <h3>IPC Using Pipes</h3>
+      <div class="define reveal">
+        <span class="df-tag">Pipe</span>
+        <p>Pipes provide <b>one-way (half-duplex)</b> communication between <b>related processes</b>, implemented on kernel I/O buffers. A pipe connects the standard output of one process to the standard input of another — the basis of UNIX shell pipelines.</p>
+      </div>
+      <ul>
+        <li>Accessed like ordinary files — they have inodes and use file descriptors.</li>
+        <li>The pipe inode resides in the <b>kernel, not the physical file system</b>.</li>
+        <li>A pipe <b>exists only while its creator process exists</b> and has <b>limited size</b> (since Linux 2.6.11, capacity is 65,536 bytes).</li>
+      </ul>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Creating &amp; Using Pipes</span>
+        <code>int pipe(int fd[2])</code> opens two descriptors — <b>fd[0] for reading</b>, <b>fd[1] for writing</b> — returning 0 on success, −1 otherwise. A child <b>inherits open descriptors</b> from the parent, so a pipe lets a process communicate with its child. Both must <b>close unused descriptors</b>, then use <code>read()</code> and <code>write()</code>.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 6 — IPC USING SOCKETS
+         ============================================================ -->
+    <section class="module" id="sockets">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">6</span> Unit I · Concurrency</div>
+        <h2>IPC Using Sockets</h2>
+        <p>Sockets as the interface between application and network, the eight key socket system calls, the server/client workflow, and socket domains and types.</p>
+      </div>
+
+      <div class="define reveal">
+        <span class="df-tag">What is a socket?</span>
+        <p>A socket is an <b>interface between an application and the network</b>. The application creates a socket, then passes data to it for transmission and receives data from it. Sockets let processes communicate <b>on the same machine or across different machines</b>.</p>
+      </div>
+
+      <h3>The Server / Client Workflow</h3>
+      <p>The socket calls must be used in a specific order. One process acts as the <b>server</b>, the other as the <b>client</b>; a server may communicate with many clients.</p>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Server Process</h4>
+          <ul>
+            <li><code>socket()</code> — create endpoint</li>
+            <li><code>bind()</code> — attach to IP &amp; port</li>
+            <li><code>listen()</code> — mark as passive</li>
+            <li><code>accept()</code> — accept a client</li>
+            <li><code>send()</code> / <code>recv()</code> — exchange data</li>
+            <li><code>close()</code> — release</li>
+          </ul>
+        </div>
+        <div class="vs-mid">⇄</div>
+        <div class="vs-side right">
+          <h4>Client Process</h4>
+          <ul>
+            <li><code>socket()</code> — create endpoint</li>
+            <li><code>connect()</code> — connect to server</li>
+            <li><code>send()</code> / <code>recv()</code> — exchange data</li>
+            <li><code>close()</code> — release</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>The Socket System Calls</h3>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Call</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td>socket()</td><td>Creates a process endpoint — <code>socket(domain, type, protocol)</code>. Returns a socket fd (&gt;0) or −1.</td></tr>
+            <tr><td>bind()</td><td>Associates the socket with a local <b>IP address and port</b>.</td></tr>
+            <tr><td>listen()</td><td>Marks the socket <b>passive</b> to accept connections — <code>listen(sockfd, backlog)</code>; backlog = max pending requests.</td></tr>
+            <tr><td>accept()</td><td>Accepts a client request and creates a <b>new socket</b> for that client; the original keeps listening.</td></tr>
+            <tr><td>connect()</td><td>Used by the <b>client</b> to establish a connection with the server.</td></tr>
+            <tr><td>send() / recv()</td><td>Send and receive data. <code>recv()</code> returns bytes received, <b>0 if connection closed</b>, −1 on error.</td></tr>
+            <tr><td>close()</td><td>Closes the socket descriptor.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Socket Domains &amp; Types</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">AF</div><h4>Domains</h4><p><b>AF_INET</b> — IPv4 · <b>AF_INET6</b> — IPv6 · <b>AF_UNIX</b> — local IPC using file-system pathnames as addresses.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">TCP</div><h4>SOCK_STREAM</h4><p>TCP sockets — <b>reliable</b>, <b>in-order</b>, <b>connection-oriented</b> delivery.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">UDP</div><h4>SOCK_DGRAM</h4><p>UDP sockets — <b>unreliable</b>, <b>no order guarantee</b>, no notion of connection.</p></div>
+      </div>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">SOCK_RAW &amp; Standard Ports</span>
+        <b>SOCK_RAW</b> gives direct access to underlying network protocols (bypassing TCP/UDP) — used for new protocols and tools like ping, traceroute, nmap and packet sniffing. Standard ports: <b>HTTP 80, FTP 20/21, POP3 110, SMTP 25, NNTP 119, Telnet 23, IRC 194</b>. Conversion functions <code>htonl/htons/ntohl</code> translate between host and network byte order.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 7 — PROCESS SYNCHRONIZATION
+         ============================================================ -->
+    <section class="module" id="sync">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">7</span> Unit I · Concurrency</div>
+        <h2>Process Synchronization</h2>
+        <p>Race conditions, the critical-section problem, the producer–consumer problem, the three requirements for a correct solution, and Peterson's software solution.</p>
+      </div>
+
+      <h3>Race Conditions</h3>
+      <p>When multiple processes/threads run concurrently and share memory, files or variables, accessing shared data <b>without coordination</b> creates a problem.</p>
+      <div class="define reveal">
+        <span class="df-tag">Race Condition</span>
+        <p>A situation where the <b>final result depends on the timing/order of threads</b>, not on the logic. For example, two concurrent <code>counter++</code> operations each compile to <i>load → add → store</i>; if these interleave arbitrarily, the result can be <b>6 (wrong)</b> instead of the expected <b>7</b>.</p>
+      </div>
+
+      <h3>The Critical Section</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">Critical Section</span>
+        For <i>n</i> processes {P₀ … Pₙ₋₁}, each has a <b>critical section</b> — a code segment that changes shared variables, tables or files. The rule: when one process is in its critical section, <b>no other may be in its own</b>. No two processes execute their critical sections simultaneously.
+      </div>
+      <p>Each process structures its code into four sections:</p>
+      <div class="diagram reveal">
+        <div class="diagram-cap">Structure of a Process</div>
+        <div class="flow">
+          <div class="flow-step"><div class="fs-num">1</div><div class="fs-body"><b>Entry Section</b><span>Requests permission to enter the critical section.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">2</div><div class="fs-body"><b>Critical Section</b><span>Access to shared resources happens here.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">3</div><div class="fs-body"><b>Exit Section</b><span>Releases the critical section.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">4</div><div class="fs-body"><b>Remainder Section</b><span>The rest of the code.</span></div></div>
+        </div>
+      </div>
+
+      <h3>The Producer–Consumer Problem</h3>
+      <div class="define reveal">
+        <span class="df-tag">Classic synchronization problem</span>
+        <p>One or more <b>producers</b> generate data, one or more <b>consumers</b> use it, and both share a <b>common buffer</b>. When they run concurrently, two issues arise.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">Producer too fast</h4>
+          <p>The buffer becomes <b>full</b> and new data may <b>overwrite old data</b>.</p>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Consumer too fast</h4>
+          <p>The buffer becomes <b>empty</b> and the consumer reads <b>invalid/garbage data</b>.</p>
+        </div>
+      </div>
+
+      <h3>Three Requirements of a Correct Solution</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">ME</div><h4>Mutual Exclusion</h4><p>If Pᵢ is in its critical section, <b>no other process</b> can be in theirs.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">P</div><h4>Progress</h4><p>If no one is in the CS and some want in, only contending processes decide who enters next — and the choice <b>cannot be postponed indefinitely</b>.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">BW</div><h4>Bounded Waiting</h4><p>There is a <b>limit</b> on how many times others enter after a process requests entry and before it is granted.</p></div>
+      </div>
+
+      <h3>Peterson's Solution</h3>
+      <div class="define reveal">
+        <span class="df-tag">Software-based</span>
+        <p>A software algorithm that ensures <b>mutual exclusion between two processes</b> (P₀ and P₁) <b>without hardware support</b>. It works only for two processes.</p>
+      </div>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Why Peterson's solution can fail on modern systems</span>
+        Modern CPUs perform <b>instruction reordering</b>, compiler optimizations, and have <b>cache inconsistency across cores</b>. This reordering + cache delay can break Peterson's solution — leading to race conditions and incorrect synchronization. The fix is <b>hardware support</b> (next section).
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 8 — LOCKS, SEMAPHORES & MONITORS
+         ============================================================ -->
+    <section class="module" id="sync2">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">8</span> Unit I · Concurrency</div>
+        <h2>Hardware Support, Locks, Semaphores &amp; Monitors</h2>
+        <p>Atomic hardware instructions, mutex locks and spinlocks, condition variables, semaphores (wait/signal), the deadlock danger of lock ordering, and monitors.</p>
+      </div>
+
+      <h3>Hardware Support for Synchronization</h3>
+      <p>Hardware support provides <b>atomic and ordered operations</b> to safely manage shared data. Three types:</p>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">MB</div><h4>Memory Barriers</h4><p>Ensure memory operations are executed <b>in order</b>.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">HI</div><h4>Hardware Instructions</h4><p>Special atomic CPU instructions — <b>Test-and-Set</b> and <b>Compare-and-Swap (CAS)</b>.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">AV</div><h4>Atomic Variables</h4><p>Variables supporting <b>indivisible</b> operations completing in one step, with no interruption.</p></div>
+      </div>
+
+      <h3>The Concept of a Lock</h3>
+      <div class="define reveal">
+        <span class="df-tag">Lock</span>
+        <p>A lock is a variable used to ensure that <b>only one process/thread enters the critical section at a time</b>.</p>
+      </div>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Why a naive lock fails</span>
+        The two steps <code>if (lock == 0)</code> then <code>lock = 1;</code> are <b>NOT atomic</b> — two threads can both pass the check. We need an operation that does <b>CHECK + SET in one atomic step</b>: that's <b>Test-and-Set</b>. <b>Compare-and-Swap</b> compares a value and updates it only if it matches the expected value.
+      </div>
+
+      <h3>Mutex Locks</h3>
+      <div class="define reveal">
+        <span class="df-tag">Mutex (Mutual Exclusion Lock)</span>
+        <p>A synchronization mechanism ensuring only one thread enters the critical section at a time. Protect a CS by first <code>acquire()</code>-ing the lock, then <code>release()</code>-ing it — both must be <b>atomic</b> (via hardware instructions like CAS).</p>
+      </div>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Spinlock (Busy Waiting)</h4>
+          <ul>
+            <li>The thread keeps checking — busy-waiting — so it's called a <b>spinlock</b>.</li>
+            <li>Used for kernel internals and <b>short critical sections</b>.</li>
+          </ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Blocking Mutex (Sleeping)</h4>
+          <ul>
+            <li>The thread <b>goes to sleep</b> and the OS wakes it later.</li>
+            <li>Modern mutexes (pthread) try fast → spin briefly → sleep (futex).</li>
+          </ul>
+        </div>
+      </div>
+      <p>The pthread interface: <code>pthread_mutex_init</code>, <code>pthread_mutex_lock</code> (blocks if locked), <code>pthread_mutex_trylock</code> (returns "busy" immediately), <code>pthread_mutex_unlock</code> and <code>pthread_mutex_destroy</code>. Mutex variables are of type <code>pthread_mutex_t</code> and must be initialized before use.</p>
+
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — Lock Ordering &amp; Deadlock</span>
+        If Thread 1 needs lock <b>x then y</b>, while Thread 2 needs lock <b>y then x</b>, they can deadlock. The fix is a consistent <b>lock ordering</b> — every thread acquires locks in the same global order.
+      </div>
+
+      <h3>Condition Variables</h3>
+      <p>Mutex ensures mutual exclusion but <b>does not</b> tell a thread <i>when</i> to proceed — it provides no condition-based synchronization.</p>
+      <div class="define reveal">
+        <span class="df-tag">Condition Variable</span>
+        <p>Allows a thread to <b>sleep until a specific condition becomes true</b>. The producer–consumer solution uses <b>two condition variables</b> — one for "buffer not full", one for "buffer not empty".</p>
+      </div>
+
+      <h3>Semaphores</h3>
+      <div class="define reveal">
+        <span class="df-tag">Semaphore</span>
+        <p>A more sophisticated synchronization tool than mutex locks. A semaphore <b>S</b> is an integer accessed only via two indivisible (atomic) operations: <code>wait()</code> and <code>signal()</code> — originally called <b>P()</b> and <b>V()</b>.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">wait(S) and signal(S)</h4>
+          <p><code>wait(S)</code>: while (S ≤ 0) busy-wait; then <b>S−−</b>.<br><code>signal(S)</code>: <b>S++</b>.</p>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Counting vs Binary</h4>
+          <ul>
+            <li><b>Counting semaphore</b> — value over an unrestricted domain (e.g. <b>3 printers</b> available).</li>
+            <li><b>Binary semaphore</b> — value 0 or 1, the same as a mutex lock.</li>
+          </ul>
+        </div>
+      </div>
+      <p>The C library: <code>sem_init(&amp;sem, 0, value)</code> (0 = shared between threads, value = initial count), <code>sem_wait(&amp;sem)</code> and <code>sem_post(&amp;sem)</code>.</p>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Common semaphore mistakes</span>
+        <code>signal(mutex) … wait(mutex)</code> (reversed), <code>wait(mutex) … wait(mutex)</code> (double-wait → deadlock), or <b>omitting</b> wait or signal entirely. These show what goes wrong when synchronization tools are used incorrectly.
+      </div>
+
+      <h3>Semaphore vs Mutex</h3>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Use a Mutex</h4>
+          <ul><li>Protecting shared data.</li><li><b>Ownership matters</b> — the same thread that locks must unlock.</li></ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Use a Semaphore</h4>
+          <ul><li><b>Signaling</b> between threads.</li><li><b>Resource counting</b>.</li><li>A different thread can wake another.</li></ul>
+        </div>
+      </div>
+
+      <h3>Monitors</h3>
+      <div class="define reveal">
+        <span class="df-tag">Monitor</span>
+        <p>A <b>high-level abstraction</b> providing a convenient mechanism for process synchronization. It is an abstract data type whose internal variables are <b>only accessible by code within its procedures</b>, and <b>only one process may be active inside the monitor at a time</b>.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 9 — THREADS & MULTITHREADING
+         ============================================================ -->
+    <section class="module" id="threads">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">9</span> Unit I · Concurrency</div>
+        <h2>Threads &amp; Multithreading</h2>
+        <p>Why threads, their benefits, concurrency vs parallelism, Amdahl's Law, user vs kernel threads, the three multithreading models, thread libraries, and threading issues.</p>
+      </div>
+
+      <h3>Motivation &amp; Benefits</h3>
+      <p>Most modern applications are multithreaded — separate threads handle separate tasks (update display, fetch data, spell check, answer a network request). <b>Process creation is heavy-weight; thread creation is light-weight.</b></p>
+      <div class="grid grid-4">
+        <div class="concept k-blue reveal"><div class="cnum">R</div><h4>Responsiveness</h4><p>Execution may continue even if part of the process is blocked — vital for user interfaces.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">RS</div><h4>Resource Sharing</h4><p>Threads share the process's resources — easier than shared memory or message passing.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">E</div><h4>Economy</h4><p>Cheaper than process creation; thread switching has lower overhead than context switching.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">S</div><h4>Scalability</h4><p>A process can take advantage of <b>multicore</b> architectures.</p></div>
+      </div>
+
+      <h3>Concurrency vs Parallelism</h3>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Concurrency</h4>
+          <ul><li>Supports more than one task <b>making progress</b>.</li><li>Achievable on a <b>single core</b> via a scheduler.</li></ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Parallelism</h4>
+          <ul><li>The system performs more than one task <b>simultaneously</b>.</li><li>Requires <b>multiple cores</b>.</li></ul>
+        </div>
+      </div>
+      <p>Two types of parallelism: <b>data parallelism</b> distributes subsets of the same data across cores (same operation on each), while <b>task parallelism</b> distributes threads across cores, each performing a unique operation.</p>
+
+      <h3>Amdahl's Law</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">Amdahl's Law</span>
+        Identifies performance gains from adding cores when an application has both serial (S) and parallel parts. If an app is <b>75% parallel / 25% serial</b>, moving from 1→2 cores gives ~<b>1.6×</b> speedup. As cores N → ∞, speedup approaches <b>1 / S</b>. The serial portion has a <b>disproportionate effect</b> on the gains.
+      </div>
+
+      <h3>User Threads vs Kernel Threads</h3>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">User Threads</h4>
+          <p>Managed by a <b>user-level threads library</b>. Three primary libraries: <b>POSIX Pthreads</b>, <b>Windows threads</b>, <b>Java threads</b>.</p>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Kernel Threads</h4>
+          <p>Supported directly by the <b>kernel</b>. Found in virtually all general-purpose OSes — Windows, Linux, macOS, iOS, Android.</p>
+        </div>
+      </div>
+
+      <h3>The Three Multithreading Models</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">M:1</div><h4>Many-to-One</h4><p>Many user threads → one kernel thread. One blocking call <b>blocks all</b>; no true parallelism. Rare today (e.g. GNU Portable Threads).</p></div>
+        <div class="concept k-green reveal"><div class="cnum">1:1</div><h4>One-to-One</h4><p>Each user thread maps to a kernel thread — <b>more concurrency</b>, but overhead limits the count. Used by <b>Windows & Linux</b>.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">M:M</div><h4>Many-to-Many</h4><p>Many user threads mapped to many kernel threads — the OS creates a sufficient number. The <b>two-level model</b> also lets a user thread bind to a kernel thread.</p></div>
+      </div>
+
+      <h3>Pthreads &amp; Implicit Threading</h3>
+      <div class="define reveal">
+        <span class="df-tag">Pthreads</span>
+        <p>A <b>POSIX standard (IEEE 1003.1c) API</b> for thread creation and synchronization. It is a <b>specification, not an implementation</b> — common in UNIX, Linux and macOS. Java threads are managed by the <b>JVM</b>, typically using the underlying OS model; standard practice is to implement the <b>Runnable interface</b>.</p>
+      </div>
+      <p><b>Implicit threading</b> moves thread creation and management to compilers and run-time libraries. Five methods: <b>Thread Pools</b>, <b>Fork-Join</b>, <b>OpenMP</b>, <b>Grand Central Dispatch</b>, and <b>Intel Threading Building Blocks (TBB)</b>.</p>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Thread Pools</span>
+        Create a number of threads in a pool that <b>await work</b>. Benefits: servicing a request with an existing thread is faster than creating one; the number of threads is bounded by the pool size; and tasks are decoupled from thread creation.
+      </div>
+
+      <h3>Threading Issues</h3>
+      <div class="grid grid-3">
+        <div class="concept reveal"><div class="cnum">⑂</div><h4>fork() &amp; exec()</h4><p>Does <code>fork()</code> duplicate one thread or all? <code>exec()</code> usually replaces all threads.</p></div>
+        <div class="concept reveal"><div class="cnum">⚑</div><h4>Signal Handling</h4><p>To which thread is a signal delivered? To the applicable thread, every thread, certain threads, or one assigned thread.</p></div>
+        <div class="concept reveal"><div class="cnum">✕</div><h4>Thread Cancellation</h4><p>Terminating a target thread — <b>asynchronous</b> (immediate) or <b>deferred</b> (checked at cancellation points). Default is deferred.</p></div>
+        <div class="concept reveal"><div class="cnum">TLS</div><h4>Thread-Local Storage</h4><p>Each thread gets its own copy of data — visible across function invocations, unique per thread.</p></div>
+        <div class="concept reveal"><div class="cnum">SA</div><h4>Scheduler Activations</h4><p>Provide <b>upcalls</b> from kernel to the thread library to maintain the right number of kernel threads, via lightweight processes (LWPs).</p></div>
+        <div class="concept reveal"><div class="cnum">L</div><h4>Linux Tasks</h4><p>Linux calls them <b>tasks</b>; creation uses <code>clone()</code>, whose flags control how much the child shares with the parent.</p></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 10 — CPU SCHEDULING
+         ============================================================ -->
+    <section class="module" id="scheduling">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">10</span> Unit I · Process Scheduling</div>
+        <h2>CPU Scheduling Algorithms</h2>
+        <p>The key scheduling metrics, and the major scheduling algorithms — FCFS, SJF, Priority and Round Robin — with the formulas for completion, turnaround and waiting time.</p>
+      </div>
+
+      <h3>Scheduling Metrics</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">CT</div><h4>Completion Time</h4><p>The time at which a process finishes execution.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">TAT</div><h4>Turnaround Time</h4><p><b>TAT = Completion Time − Arrival Time</b>. Total time from arrival to completion.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">WT</div><h4>Waiting Time</h4><p><b>WT = Turnaround Time − Burst Time</b>. Time spent waiting in the ready queue.</p></div>
+      </div>
+
+      <h3>Scheduling Algorithms</h3>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Algorithm</th><th>Type</th><th>How it works</th></tr></thead>
+          <tbody>
+            <tr><td>FCFS — First Come First Serve</td><td>Non-preemptive</td><td>Processes run in <b>arrival order</b>. Simple but suffers the <b>convoy effect</b> — short jobs wait behind long ones.</td></tr>
+            <tr><td>SJF — Shortest Job First</td><td>Non-preemptive</td><td>Runs the process with the <b>shortest burst time</b> next. Optimal average waiting time but needs to know burst lengths.</td></tr>
+            <tr><td>SRTF — Shortest Remaining Time First</td><td>Preemptive</td><td>The preemptive version of SJF — a newly arrived shorter job preempts the running one.</td></tr>
+            <tr><td>Priority Scheduling</td><td>Both</td><td>The highest-priority process runs first. Risk of <b>starvation</b>, solved by <b>aging</b>.</td></tr>
+            <tr><td>Round Robin (RR)</td><td>Preemptive</td><td>Each process gets a fixed <b>time quantum</b>; ideal for time-sharing. Fair, with bounded waiting.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — Solving Scheduling Problems</span>
+        For any numerical: draw the <b>Gantt chart</b> first, then read off <b>Completion Times</b>. Compute <b>TAT = CT − AT</b> and <b>WT = TAT − BT</b> for each process, then take the <b>averages</b>. FCFS is non-preemptive (arrival order); RR uses the time quantum.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 11 — MEMORY MANAGEMENT
+         ============================================================ -->
+    <section class="module" id="memory">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">11</span> Unit II · Memory</div>
+        <h2>Memory Management</h2>
+        <p>Background and protection, address binding, logical vs physical addresses, the MMU, dynamic loading & linking, and the contiguous allocation schemes — fixed and dynamic partitioning with their fit algorithms.</p>
+      </div>
+
+      <h3>Background</h3>
+      <ul>
+        <li>A program must be brought <b>from disk into memory</b> and placed within a process to run.</li>
+        <li>Register access takes <b>one CPU clock</b>; main memory can take <b>many cycles</b>; a <b>cache</b> sits between them.</li>
+        <li><b>Protection</b> of memory is required for correct operation.</li>
+      </ul>
+      <div class="define reveal">
+        <span class="df-tag">Base &amp; Limit Registers</span>
+        <p>A process must access only addresses in its own address space. A pair of <b>base</b> and <b>limit</b> registers defines its logical address space; the CPU <b>checks every user-mode access</b> against them. The instructions that load these registers are <b>privileged</b>.</p>
+      </div>
+
+      <h3>Address Binding</h3>
+      <p>Addresses are represented differently at different stages of a program's life — source code uses <b>symbolic</b> addresses, compiled code uses <b>relocatable</b> addresses, and the linker/loader binds them to <b>absolute</b> addresses. Binding can happen at three stages:</p>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">①</div><h4>Compile Time</h4><p>If the location is known in advance, <b>absolute code</b> is generated — but the code must be recompiled if the start location changes.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">②</div><h4>Load Time</h4><p>If the location is unknown at compile time, <b>relocatable code</b> is generated.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">③</div><h4>Execution Time</h4><p>Binding is delayed until run time so the process can be <b>moved during execution</b> — needs hardware support (base/limit registers).</p></div>
+      </div>
+
+      <h3>Logical vs Physical Address Space</h3>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Logical (Virtual) Address</h4>
+          <ul><li>Generated by the <b>CPU</b>.</li><li>The set of all such addresses is the <b>logical address space</b>.</li></ul>
+        </div>
+        <div class="vs-mid">→</div>
+        <div class="vs-side right">
+          <h4>Physical Address</h4>
+          <ul><li>The address seen by the <b>memory unit</b>.</li><li>They are the same under compile/load-time binding, but <b>differ</b> under execution-time binding.</li></ul>
+        </div>
+      </div>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">Memory-Management Unit (MMU)</span>
+        A hardware device that maps virtual → physical addresses at run time. In the simple <b>relocation-register</b> scheme, the register's value is <b>added to every address</b> a user process generates. The user program <b>never sees real physical addresses</b>.
+      </div>
+
+      <h3>Dynamic Loading &amp; Dynamic Linking</h3>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">Dynamic Loading</h4>
+          <p>A routine is <b>not loaded until it is called</b> — better memory utilization, since unused routines are never loaded. Useful for large, infrequently-used code. No special OS support required.</p>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Dynamic Linking</h4>
+          <p>Linking is <b>postponed until execution time</b>. A small <b>stub</b> locates the memory-resident library routine and replaces itself with the routine's address. Also known as <b>shared libraries</b>.</p>
+        </div>
+      </div>
+
+      <h3>Memory Management Techniques</h3>
+      <div class="diagram reveal">
+        <div class="diagram-cap">Two Families of Allocation</div>
+        <div class="grid grid-2" style="margin:0">
+          <div class="card reveal">
+            <h4 style="margin-top:0;color:var(--c-blue)">Contiguous</h4>
+            <p>The executing process must be loaded <b>entirely</b> in main memory.</p>
+            <ul><li><b>Fixed (static)</b> partitioning</li><li><b>Variable (dynamic)</b> partitioning</li></ul>
+          </div>
+          <div class="card reveal">
+            <h4 style="margin-top:0;color:var(--c-green)">Non-Contiguous</h4>
+            <p>The process is loaded into <b>non-contiguous</b> locations.</p>
+            <ul><li><b>Paging</b></li><li><b>Segmentation</b></li></ul>
+          </div>
+        </div>
+      </div>
+
+      <h3>Fixed (Static) Partitioning</h3>
+      <ul>
+        <li>The number of partitions is <b>fixed</b>; sizes may or may not be equal.</li>
+        <li>Being contiguous, <b>no spanning</b> is allowed.</li>
+        <li>The number of partitions defines the <b>degree of multiprogramming</b>.</li>
+        <li>Suffers from <b>internal fragmentation</b>.</li>
+      </ul>
+
+      <h3>Partition Allocation (Fit) Algorithms</h3>
+      <div class="grid grid-4">
+        <div class="concept k-blue reveal"><div class="cnum">1st</div><h4>First Fit</h4><p>Allocate the <b>first sufficient block</b> from the top of memory.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">B</div><h4>Best Fit</h4><p>Allocate the <b>smallest sufficient</b> free partition.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">W</div><h4>Worst Fit</h4><p>Allocate the <b>largest sufficient</b> free partition.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">N</div><h4>Next Fit</h4><p>Like first fit, but searches from the <b>last allocation point</b>.</p></div>
+      </div>
+
+      <h3>Dynamic (Variable) Partitioning</h3>
+      <p>Partitions are created at <b>run-time</b> according to each process's need — the partition size equals the incoming process, so the number of partitions is not fixed.</p>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="color:var(--c-green);margin-top:0">Advantages</h4>
+          <ul><li><b>No internal fragmentation</b> — space allocated exactly to need.</li><li><b>No restriction</b> on the degree of multiprogramming.</li><li><b>No limit</b> on process size (vs largest fixed partition).</li></ul>
+        </div>
+        <div class="card reveal">
+          <h4 style="color:var(--brand);margin-top:0">Disadvantages</h4>
+          <ul><li><b>Difficult to implement</b> — allocation at run-time.</li><li><b>External fragmentation</b>, requiring a <b>compaction</b> algorithm.</li></ul>
+        </div>
+      </div>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Solving the storage-allocation problem</span>
+        Three remedies for fragmentation: a <b>Hole</b> is a block of available memory; <b>Coalescing</b> merges adjacent free holes; <b>Compaction</b> shuffles memory to place all free space together.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 12 — PAGING & SEGMENTATION
+         ============================================================ -->
+    <section class="module" id="paging">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">12</span> Unit II · Memory</div>
+        <h2>Paging &amp; Segmentation</h2>
+        <p>Non-contiguous allocation — paging with its address-translation scheme, the page table and TLB, and segmentation with its segment table, plus a side-by-side comparison.</p>
+      </div>
+
+      <h3>Paging</h3>
+      <div class="define reveal">
+        <span class="df-tag">Paging</span>
+        <p>Allows a process's logical address space to be <b>non-contiguous</b>. Physical memory is divided into fixed-size <b>frames</b> (a power of 2, between 512 B and 8 KB); logical memory into same-size <b>pages</b>. To run a program of <i>n</i> pages, find <i>n</i> free frames and set up a <b>page table</b> to translate logical to physical addresses. <b>Internal fragmentation is possible.</b></p>
+      </div>
+
+      <h3>Address-Translation Scheme</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">Page Number + Page Offset</span>
+        The CPU-generated address splits into a <b>page number (p)</b> — an index into the page table holding each page's base address — and a <b>page offset (d)</b>, combined with the base to give the physical address. For a logical space of 2ᵐ and page size 2ⁿ, <b>p uses (m−n) bits and d uses n bits</b>.
+      </div>
+
+      <h3>Implementing the Page Table</h3>
+      <ul>
+        <li>The page table is kept in main memory; <b>PTBR</b> points to it and <b>PTLR</b> indicates its length.</li>
+        <li>Naively, every access needs <b>two memory accesses</b> — one for the table, one for the data.</li>
+        <li>This is solved by the <b>TLB (Translation Look-aside Buffer)</b> — a fast associative-memory cache.</li>
+      </ul>
+      <div class="define reveal">
+        <span class="df-tag">TLB</span>
+        <p>On a <b>TLB miss</b>, the page table is consulted and the &lt;page, frame&gt; pair is added to the TLB (replacing an entry if full). Some entries (kernel code) are <b>wired down</b>. <b>ASIDs</b> (address-space identifiers) uniquely identify each process so the TLB need not be flushed on every context switch.</p>
+      </div>
+
+      <h3>Segmentation</h3>
+      <div class="define reveal">
+        <span class="df-tag">Segmentation</span>
+        <p>A memory-management scheme that <b>supports the user's view of memory</b>. A program is a collection of <b>segments</b> — logical units such as the main program, procedures, functions, objects, local & global variables, stack, symbol table and arrays.</p>
+      </div>
+      <p>A logical address is a tuple <b>&lt;segment-number, offset&gt;</b>. The <b>segment table</b> maps it: each entry has a <b>base</b> (starting physical address) and a <b>limit</b> (segment length). <b>STBR</b> points to the table; <b>STLR</b> gives the number of segments — segment <i>s</i> is legal if <i>s</i> &lt; STLR.</p>
+
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="color:var(--c-green);margin-top:0">Advantages of Segmentation</h4>
+          <ul>
+            <li><b>No internal fragmentation</b>.</li>
+            <li>Segment tables consume <b>less memory</b> than page tables (one entry per segment).</li>
+            <li>Lends itself to <b>sharing data</b> among processes.</li>
+            <li>Each segment can be set its own <b>access right</b>.</li>
+          </ul>
+        </div>
+        <div class="card reveal">
+          <h4 style="color:var(--brand);margin-top:0">Disadvantages</h4>
+          <ul>
+            <li><b>External fragmentation</b>.</li>
+            <li>Costly memory-management algorithm.</li>
+            <li>Unequal segment sizes are awkward for swapping.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — Paging vs Segmentation</span>
+        <b>Paging</b> = fixed-size pages, invisible to the user, suffers <b>internal</b> fragmentation. <b>Segmentation</b> = variable-size logical units matching the user's view, suffers <b>external</b> fragmentation. Both are non-contiguous.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 13 — VIRTUAL MEMORY & DEMAND PAGING
+         ============================================================ -->
+    <section class="module" id="vm">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">13</span> Unit II · Memory</div>
+        <h2>Virtual Memory &amp; Demand Paging</h2>
+        <p>The idea of virtual memory, demand paging with the lazy swapper, the valid–invalid bit, and the step-by-step handling of a page fault.</p>
+      </div>
+
+      <h3>What is Virtual Memory?</h3>
+      <div class="define reveal">
+        <span class="df-tag">Virtual Memory</span>
+        <p>The <b>separation of user logical memory from physical memory</b>. Only part of a program needs to be in memory to execute, so the logical address space can be <b>much larger than physical memory</b>.</p>
+      </div>
+      <div class="grid grid-2">
+        <ul>
+          <li>Only part of the program needs to be in memory — <b>less memory needed</b>.</li>
+          <li><b>Faster response</b> and support for <b>more users</b>.</li>
+        </ul>
+        <ul>
+          <li>Allows address spaces to be <b>shared</b> by several processes.</li>
+          <li>Allows for more <b>efficient process creation</b>.</li>
+        </ul>
+      </div>
+      <p>Virtual memory can be implemented via <b>demand paging</b> or <b>demand segmentation</b>.</p>
+
+      <h3>Demand Paging</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">The Lazy Swapper</span>
+        Demand paging brings a page into memory <b>only when it is needed</b>. A <b>lazy swapper</b> never swaps a page in unless it will be needed — a swapper that deals with pages is called a <b>pager</b>.
+      </div>
+
+      <h3>The Valid–Invalid Bit</h3>
+      <div class="define reveal">
+        <span class="df-tag">Valid–Invalid Bit</span>
+        <p>Each page-table entry has a valid–invalid bit: <b>v</b> = in-memory, <b>i</b> = not-in-memory. Initially all entries are set to <b>i</b>. During address translation, if the bit is <b>i</b>, a <b>page fault</b> traps to the OS.</p>
+      </div>
+
+      <h3>Steps in Handling a Page Fault</h3>
+      <div class="diagram reveal">
+        <div class="diagram-cap">Page-Fault Service Routine</div>
+        <div class="flow">
+          <div class="flow-step"><div class="fs-num">1</div><div class="fs-body"><b>Check the Table</b><span>The OS checks another table — an invalid reference aborts; a valid one is just not yet in memory.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">2</div><div class="fs-body"><b>Get an Empty Frame</b><span>Find a free frame in physical memory.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">3</div><div class="fs-body"><b>Swap the Page In</b><span>Bring the desired page into the frame from disk.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">4</div><div class="fs-body"><b>Reset the Tables</b><span>Update the page and frame tables; set the validation bit to v.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">5</div><div class="fs-body"><b>Restart the Instruction</b><span>Re-run the instruction that caused the fault.</span></div></div>
+        </div>
+      </div>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">No free frame?</span>
+        If there is no free frame, the OS uses a <b>page-replacement algorithm</b> to find a page in memory that is not really in use and <b>swaps it out</b>. The same page may be brought into memory several times.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 14 — PAGE REPLACEMENT & THRASHING
+         ============================================================ -->
+    <section class="module" id="replace">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">14</span> Unit II · Memory</div>
+        <h2>Page Replacement &amp; Thrashing</h2>
+        <p>Basic page replacement, the three classic algorithms — FIFO, Optimal and LRU — with their page-fault behaviour, plus thrashing.</p>
+      </div>
+
+      <h3>Basic Page Replacement</h3>
+      <div class="diagram reveal">
+        <div class="diagram-cap">Replacing a Victim Frame</div>
+        <div class="flow">
+          <div class="flow-step"><div class="fs-num">1</div><div class="fs-body"><b>Locate the Page</b><span>Find the desired page on disk.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">2</div><div class="fs-body"><b>Find a Frame</b><span>If free, use it; otherwise use a replacement algorithm to select a victim frame.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">3</div><div class="fs-body"><b>Bring In the Page</b><span>Load the desired page into the newly free frame; update the page and frame tables.</span></div></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step"><div class="fs-num">4</div><div class="fs-body"><b>Restart the Process</b><span>Resume execution.</span></div></div>
+        </div>
+      </div>
+      <p>We want the <b>lowest page-fault rate</b>. Algorithms are evaluated by running them on a <b>reference string</b> of memory references and counting page faults. The standard example string is <code>1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5</code>.</p>
+
+      <h3>The Three Classic Algorithms</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">FIFO</div><h4>First-In-First-Out</h4><p>Replaces the <b>oldest</b> page. Simple but can perform poorly — and exhibits <b>Belady's anomaly</b> (more frames can mean more faults). On the example: <b>9 faults</b> with 3 frames, <b>10 faults</b> with 4.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">OPT</div><h4>Optimal</h4><p>Replaces the page <b>not used for the longest future period</b>. Gives the fewest faults (<b>6</b> on the example) but requires future knowledge — used mainly as a benchmark.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">LRU</div><h4>Least Recently Used</h4><p>Replaces the page <b>not used for the longest past period</b> — an approximation of Optimal. Implemented with a <b>counter</b> per page entry that records the clock at each reference.</p></div>
+      </div>
+
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — Page-Fault Counts</span>
+        Memorise the example string <code>1,2,3,4,1,2,5,1,2,3,4,5</code>: with the same frames, <b>OPT &le; LRU &le; FIFO</b> in faults. OPT looks <b>forward</b>; LRU looks <b>backward</b>; FIFO ignores usage. Watch for <b>Belady's anomaly</b> in FIFO.
+      </div>
+
+      <h3>Thrashing</h3>
+      <div class="define reveal">
+        <span class="df-tag">Thrashing</span>
+        <p>When a process does not have enough frames, it spends <b>more time paging than executing</b> — page faults follow one another so closely that the CPU utilization collapses. The OS may increase the degree of multiprogramming and make it worse; the <b>working-set model</b> helps allocate enough frames to avoid it.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 15 — DEADLOCKS
+         ============================================================ -->
+    <section class="module" id="deadlock">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">15</span> Unit III · Deadlocks</div>
+        <h2>Deadlocks</h2>
+        <p>The four necessary conditions, the four ways of handling deadlocks — prevention, avoidance (Banker's Algorithm), detection and recovery.</p>
+      </div>
+
+      <h3>What is a Deadlock?</h3>
+      <div class="define reveal">
+        <span class="df-tag">Deadlock</span>
+        <p>A set of processes is deadlocked when <b>every process in the set is waiting for an event that only another process in the set can cause</b> — typically the release of a resource. None can proceed.</p>
+      </div>
+
+      <h3>The Four Necessary Conditions</h3>
+      <p>A deadlock can arise only if <b>all four</b> hold simultaneously:</p>
+      <div class="grid grid-4">
+        <div class="concept k-blue reveal"><div class="cnum">①</div><h4>Mutual Exclusion</h4><p>At least one resource is held in a <b>non-sharable</b> mode.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">②</div><h4>Hold and Wait</h4><p>A process holding resources is <b>waiting</b> to acquire more held by others.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">③</div><h4>No Preemption</h4><p>Resources cannot be <b>forcibly taken</b> — only released voluntarily.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">④</div><h4>Circular Wait</h4><p>A circular chain of processes exists, each waiting for a resource held by the next.</p></div>
+      </div>
+
+      <h3>Four Ways to Handle Deadlocks</h3>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Strategy</th><th>Idea</th></tr></thead>
+          <tbody>
+            <tr><td>Prevention</td><td>Ensure at least one of the four necessary conditions <b>cannot hold</b> — e.g. eliminate hold-and-wait or impose a total ordering to break circular wait.</td></tr>
+            <tr><td>Avoidance</td><td>Use advance information about resource needs to keep the system in a <b>safe state</b> — the <b>Banker's Algorithm</b>.</td></tr>
+            <tr><td>Detection</td><td>Allow deadlocks to occur, then run a <b>detection algorithm</b> (a wait-for graph) to find them.</td></tr>
+            <tr><td>Recovery</td><td>Break a detected deadlock by <b>process termination</b> or <b>resource preemption</b> (rolling back a victim).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Deadlock Avoidance — Banker's Algorithm</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">Safe State</span>
+        The Banker's Algorithm grants a resource request only if doing so leaves the system in a <b>safe state</b> — one where there exists a <b>safe sequence</b> in which every process can finish. A safe state is never a deadlocked state, though not every unsafe state is a deadlock.
+      </div>
+
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — Remember "M-H-N-C"</span>
+        The four conditions: <b>M</b>utual Exclusion, <b>H</b>old-and-Wait, <b>N</b>o Preemption, <b>C</b>ircular Wait. Prevention attacks one condition; avoidance keeps a safe state; detection + recovery lets it happen then fixes it.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 16 — DISK & STORAGE MANAGEMENT
+         ============================================================ -->
+    <section class="module" id="disk">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">16</span> Unit III · I/O &amp; Storage</div>
+        <h2>Disk &amp; Storage Management</h2>
+        <p>Disk geometry, the components of disk access time, and the five disk-scheduling algorithms — FCFS, SSTF, SCAN, C-SCAN and LOOK — with a worked access-time example.</p>
+      </div>
+
+      <h3>Disk Structure</h3>
+      <p>Magnetic disks provide the bulk of secondary storage. Data is stored on a stack of rotating magnetic platters in concentric tracks; read/write heads move radially to position over the desired track.</p>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">S</div><h4>Sector</h4><p>The <b>smallest unit</b> that can be read or written — data is stored in equal-size blocks (512 to 4096 bytes).</p></div>
+        <div class="concept k-green reveal"><div class="cnum">T</div><h4>Track</h4><p>A circle of consecutive sectors on one surface, along one revolution.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">C</div><h4>Cylinder</h4><p>A collection of tracks at the <b>same radius</b> across multiple surfaces — accessing within a cylinder needs only a faster <b>head switch</b>, not head movement.</p></div>
+      </div>
+
+      <h3>Disk Access Time</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">Access Time = Seek + Rotational Latency + Transfer</span>
+        <b>Seek time</b> — time to move the head to the desired track. <b>Rotational latency</b> — time for the desired sector to rotate under the head (average = ½ rotation). <b>Transfer time</b> = transfer size ÷ transfer rate.
+      </div>
+      <div class="define reveal">
+        <span class="df-tag">Worked Example</span>
+        <p>Given transfer size 8 KB, average seek 12 ms, 7200 RPM, transfer rate 4 MB/s:<br>
+        <b>Rotational latency</b> = (60 / 7200) ÷ 2 = 8.33 ÷ 2 = <b>4.16 ms</b>.<br>
+        <b>Transfer time</b> = 8 / 4000 = 0.002 s = <b>2 ms</b>.<br>
+        <b>Total access time</b> = 12 + 4.16 + 2 = <b>18.16 ms</b>.</p>
+      </div>
+
+      <h3>Disk Scheduling</h3>
+      <p>The OS schedules disk I/O requests in a good order to improve <b>access time</b> and <b>bandwidth</b> (total bytes transferred ÷ total time). Using the standard queue <code>98, 183, 37, 122, 14, 124, 65, 67</code> with the head at cylinder 53:</p>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Algorithm</th><th>How it works</th></tr></thead>
+          <tbody>
+            <tr><td>FCFS</td><td>Services requests in <b>arrival order</b>. Fair, but slow — the example gives <b>640 cylinders</b> of head movement.</td></tr>
+            <tr><td>SSTF (Shortest Seek Time First)</td><td>Services the request <b>closest to the current head</b>. Better than FCFS, but can cause <b>starvation</b>.</td></tr>
+            <tr><td>SCAN (Elevator)</td><td>The arm moves to <b>one end servicing requests</b>, then reverses — scanning back and forth like an elevator.</td></tr>
+            <tr><td>C-SCAN</td><td>Like SCAN, but on reaching the end it <b>jumps back to the start</b> without servicing on the return — giving more <b>uniform wait time</b>.</td></tr>
+            <tr><td>LOOK</td><td>Like SCAN but the arm only goes <b>as far as the last request</b> in each direction, not the physical end of the disk.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — Choosing an Algorithm</span>
+        <b>SSTF</b> is common and naturally appealing (better than FCFS). <b>SCAN</b> and <b>C-SCAN</b> perform better under heavy load because they avoid <b>starvation</b>. The scheduler should be a <b>separate module</b> so it can be swapped out.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 17 — FILE MANAGEMENT
+         ============================================================ -->
+    <section class="module" id="files">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">17</span> Unit IV · Files</div>
+        <h2>File Management</h2>
+        <p>What a file is, file attributes and operations, file types and access methods, directory structures, and the OS's file-system management activities.</p>
+      </div>
+
+      <h3>The File Concept</h3>
+      <div class="define reveal">
+        <span class="df-tag">File</span>
+        <p>The OS provides a <b>uniform, logical view of information storage</b>, abstracting the physical properties of storage devices into a logical unit — the <b>file</b>. Each medium (disk drive, tape drive) is controlled by a device with varying access speed, capacity, transfer rate and access method.</p>
+      </div>
+
+      <h3>File Attributes &amp; Operations</h3>
+      <div class="grid grid-2">
+        <div class="card reveal">
+          <h4 style="margin-top:0">Attributes</h4>
+          <p>Name, identifier, type, location, size, protection, and time/date/owner information — stored in the directory structure.</p>
+        </div>
+        <div class="card reveal">
+          <h4 style="margin-top:0">Operations</h4>
+          <p>Create, write, read, reposition (seek), delete and truncate — the six basic operations the OS provides via system calls.</p>
+        </div>
+      </div>
+
+      <h3>File Access Methods</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">SEQ</div><h4>Sequential</h4><p>Information is processed <b>in order</b>, one record after another — the most common method.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">DIR</div><h4>Direct (Relative)</h4><p>The file is a numbered sequence of blocks/records read or written in <b>any order</b> — fast random access.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">IDX</div><h4>Indexed</h4><p>An <b>index</b> is built containing pointers to blocks; the index is searched, then the block is accessed directly.</p></div>
+      </div>
+
+      <h3>Directory Structures</h3>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th>Structure</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Single-Level</td><td>All files in <b>one directory</b> — simple, but naming conflicts and no grouping.</td></tr>
+            <tr><td>Two-Level</td><td>A separate directory <b>per user</b> — solves naming conflicts between users.</td></tr>
+            <tr><td>Tree-Structured</td><td>A <b>hierarchy</b> of directories and subdirectories — the most common, allowing grouping.</td></tr>
+            <tr><td>Acyclic-Graph</td><td>Allows <b>shared</b> subdirectories and files (via links) — but no cycles.</td></tr>
+            <tr><td>General Graph</td><td>Permits cycles — needs garbage collection to reclaim space.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">File-System Management Activities</span>
+        Files are usually organized into <b>directories</b> with <b>access control</b> determining who can access what. The OS handles: creating & deleting files and directories, primitives to manipulate them, <b>mapping files onto secondary storage</b>, and <b>backing up</b> files onto stable storage.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MODULE 18 — SECURITY & VIRTUALIZATION
+         ============================================================ -->
+    <section class="module" id="security">
+      <div class="module-head reveal">
+        <div class="module-kicker"><span class="knum">18</span> Unit IV · Security</div>
+        <h2>OS Security, Virtualization &amp; Sandboxing</h2>
+        <p>Protection vs security, access control, the role and types of hypervisors, container virtualization with Docker, sandboxing, and the computing environments.</p>
+      </div>
+
+      <h3>Protection vs Security</h3>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Protection</h4>
+          <ul><li>Any mechanism for <b>controlling access of processes or users to resources</b> defined by the OS.</li><li>Internal — about <b>who can do what</b>.</li></ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Security</h4>
+          <ul><li>Defense against <b>internal and external attacks</b>.</li><li>Covers denial-of-service, worms, viruses, identity & service theft.</li></ul>
+        </div>
+      </div>
+
+      <h3>Access Control</h3>
+      <p>Systems distinguish among <b>users</b> to determine who can do what:</p>
+      <ul>
+        <li><b>User IDs</b> (security IDs) — a name and number, one per user, associated with all that user's files and processes for access control.</li>
+        <li><b>Group IDs</b> — define a set of users so controls can be managed collectively.</li>
+        <li><b>Privilege escalation</b> — allows a user to change to an effective ID with more rights.</li>
+      </ul>
+
+      <h3>Virtualization</h3>
+      <div class="define reveal">
+        <span class="df-tag">Virtualization</span>
+        <p>Allows operating systems to run applications <b>within other OSes</b>. It typically refers to creating a <b>virtual machine</b> that virtualizes all hardware resources — processors, memory, storage and network — so physical hardware can be shared by one or more VMs.</p>
+      </div>
+      <p>Benefits: <b>consolidation</b> to reduce hardware cost, <b>optimization</b> of workloads, and IT <b>flexibility and responsiveness</b>. <b>Emulation</b> is used when the source CPU type differs from the target (e.g. PowerPC → x86) and is the slowest method.</p>
+
+      <h3>The Hypervisor (VMM)</h3>
+      <div class="callout callout-key">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 1 1-6.2-8.5" stroke-linecap="round"/></svg>
+        <span class="callout-title">Hypervisor / Virtual Machine Monitor</span>
+        A software layer that lets multiple <b>Guest OSes (VMs) run simultaneously</b> on a single physical host, providing hardware abstraction and efficiently multiplexing the underlying resources. A VMM manages CPU, memory, I/O, interrupts and the instruction set; a hypervisor may refer to an OS <i>with</i> the VMM.
+      </div>
+      <div class="versus reveal">
+        <div class="vs-side left">
+          <h4>Type 1 Hypervisor</h4>
+          <ul><li>Runs <b>directly on the hardware</b> (bare metal).</li><li>Examples: Xen Server.</li></ul>
+        </div>
+        <div class="vs-mid">vs</div>
+        <div class="vs-side right">
+          <h4>Type 2 Hypervisor</h4>
+          <ul><li>Runs <b>on top of a host OS</b>.</li><li>Examples: VirtualBox on Windows.</li></ul>
+        </div>
+      </div>
+
+      <h3>Container Virtualization &amp; Docker</h3>
+      <div class="define reveal">
+        <span class="df-tag">Containers (OS-Level Virtualization)</span>
+        <p>Containers use the <b>host operating system as their base</b>, not a hypervisor. They virtualize the OS itself, <b>sharing the host OS kernel</b> and its resources. Isolation is provided by kernel <b>namespaces</b> — global resources are wrapped so they're visible only to processes in the same namespace.</p>
+      </div>
+      <p><b>Docker</b> is a collection of open-source tools, solutions and cloud services that provide a common model for <b>packaging (containerizing) application code into images</b> that can be easily distributed to and deployed on Linux hosts.</p>
+
+      <h3>Sandboxing</h3>
+      <div class="callout callout-note">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Sandboxing</span>
+        A sandbox is a <b>tightly controlled, isolated environment</b> in which untrusted code can run with restricted access to the rest of the system — limiting the damage malicious or buggy programs can do. Namespaces and containers are practical applications of the same isolation principle.
+      </div>
+
+      <h3>Computing Environments</h3>
+      <div class="grid grid-3">
+        <div class="concept k-blue reveal"><div class="cnum">T</div><h4>Traditional</h4><p>Stand-alone general-purpose machines, now mostly interconnected via the Internet behind firewalls.</p></div>
+        <div class="concept k-green reveal"><div class="cnum">M</div><h4>Mobile</h4><p>Handhelds with extra features (GPS, gyroscope), using 802.11 or cellular. Leaders: iOS & Android.</p></div>
+        <div class="concept k-orange reveal"><div class="cnum">CS</div><h4>Client–Server</h4><p>Servers respond to requests from clients — compute-server and file-server systems.</p></div>
+        <div class="concept k-purple reveal"><div class="cnum">P2P</div><h4>Peer-to-Peer</h4><p>No client/server distinction — all nodes are <b>peers</b> (Napster, Gnutella, Skype/VoIP).</p></div>
+        <div class="concept k-teal reveal"><div class="cnum">☁</div><h4>Cloud Computing</h4><p>Delivers computing, storage and apps as a service — built on virtualization. Types: <b>public, private, hybrid; SaaS, PaaS, IaaS</b>.</p></div>
+        <div class="concept k-blue reveal"><div class="cnum">RT</div><h4>Real-Time Embedded</h4><p>The most prevalent form of computers, with <b>well-defined fixed time constraints</b> that must be met for correct operation.</p></div>
+      </div>
+
+      <div class="callout callout-exam">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5z" stroke-linejoin="round"/><path d="M3 8v6M7 10.5V15c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="callout-title">Exam Tip — VM vs Container</span>
+        A <b>hypervisor</b> runs full guest OSes (each with its own kernel) — heavier but stronger isolation. A <b>container</b> shares the host kernel via namespaces — lighter and faster but with weaker isolation. Both rest on the same goal: <b>sharing hardware safely</b>.
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer class="foot">
+      <div class="foot-top">
+        <div style="max-width:320px">
+          <b>OS Notes</b>
+          <p style="margin-top:8px;font-size:.9rem;line-height:1.6">Operating Systems — a complete revision companion built from your B.Tech lecture decks and lab assignments. Best of luck for ESE 2026.</p>
+        </div>
+        <div class="foot-modules">
+          <a href="#intro">Introduction</a>
+          <a href="#structure">Structure</a>
+          <a href="#services">Services & Calls</a>
+          <a href="#process">Processes</a>
+          <a href="#ipc">IPC</a>
+          <a href="#sockets">Sockets</a>
+          <a href="#sync">Synchronization</a>
+          <a href="#sync2">Semaphores</a>
+          <a href="#threads">Threads</a>
+          <a href="#scheduling">Scheduling</a>
+          <a href="#memory">Memory</a>
+          <a href="#paging">Paging</a>
+          <a href="#vm">Virtual Memory</a>
+          <a href="#replace">Page Replacement</a>
+          <a href="#deadlock">Deadlocks</a>
+          <a href="#disk">Disk Scheduling</a>
+          <a href="#files">File Management</a>
+          <a href="#security">Security</a>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        Compiled for study &amp; revision purposes from course lecture material. · Use the <b>⌘/Ctrl + P</b> shortcut to print or save as PDF. · Toggle light/dark with the theme button.
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<button id="totop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script src="app.js"></script>
+</body>
+</html>
