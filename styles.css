@@ -643,6 +643,15 @@ tbody td:first-child { font-family: var(--font-sans); font-weight: 600; color: v
 .foot .foot-modules a { color: var(--ink-soft); text-decoration: none; }
 .foot .foot-modules a:hover { color: var(--brand); }
 .foot-bottom { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--line); font-size: .82rem; }
+.foot-author {
+  margin-top: 16px; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
+  color: var(--brand); line-height: 1.2; display: flex; flex-direction: column;
+}
+.foot-author span {
+  font-family: var(--font-sans); font-weight: 600; font-size: .68rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-faint); margin-top: 3px;
+}
+.foot-bottom b { color: var(--brand); }
 
 /* Back to top */
 #totop {
