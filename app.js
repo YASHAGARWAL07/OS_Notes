@@ -261,4 +261,93 @@
     }
   });
 
+  /* ---------------------------------------------------------
+     7.  EXAM Q&A  —  expand / collapse controls + print
+     --------------------------------------------------------- */
+  const qaItems   = $$('.qa');
+  const expandBtn = $('#exam-expand');
+  const collapseBtn = $('#exam-collapse');
+  const countEl   = $('#exam-count');
+
+  if (qaItems.length) {
+    if (countEl) countEl.textContent = qaItems.length + ' questions';
+    if (expandBtn)  expandBtn.addEventListener('click',  () => qaItems.forEach(d => d.open = true));
+    if (collapseBtn) collapseBtn.addEventListener('click', () => qaItems.forEach(d => d.open = false));
+
+    // when search jumps to a heading/term inside a closed answer, open it
+    const openContaining = (el) => {
+      const d = el && el.closest('.qa');
+      if (d && !d.open) d.open = true;
+    };
+    const origFlashTarget = searchResults; // hook via goToResult side-effect
+    searchResults.addEventListener('click', e => {
+      const btn = e.target.closest('.sr-item');
+      if (!btn) return;
+      const it = currentResults[+btn.dataset.i];
+      if (it) openContaining(it.target);
+    });
+
+    // ensure all answers are open during print, then restore state
+    let snapshot = null;
+    window.addEventListener('beforeprint', () => {
+      snapshot = qaItems.map(d => d.open);
+      qaItems.forEach(d => d.open = true);
+    });
+    window.addEventListener('afterprint', () => {
+      if (snapshot) qaItems.forEach((d, i) => d.open = snapshot[i]);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     8.  COPY BUTTONS ON CODE BLOCKS
+     --------------------------------------------------------- */
+  $$('.code').forEach(block => {
+    // wrap so the button can position relative to the block
+    const wrap = document.createElement('div');
+    wrap.className = 'code-wrap';
+    block.parentNode.insertBefore(wrap, block);
+    wrap.appendChild(block);
+
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.type = 'button';
+    btn.textContent = 'Copy';
+    btn.setAttribute('aria-label', 'Copy code to clipboard');
+    wrap.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+      const text = block.innerText;
+      const done = () => { btn.textContent = 'Copied!'; btn.classList.add('ok'); setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      } else {
+        fallbackCopy(text, done);
+      }
+    });
+  });
+
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------------------------------------------------------
+     9.  KEYBOARD-SHORTCUT HINT  (shows once, dismissible)
+     --------------------------------------------------------- */
+  try {
+    if (!localStorage.getItem('os-hint-seen')) {
+      const hint = document.createElement('div');
+      hint.className = 'kbd-hint';
+      hint.innerHTML = 'Press <kbd>/</kbd> to search · <kbd>Ctrl/⌘ P</kbd> to print all answers';
+      document.body.appendChild(hint);
+      requestAnimationFrame(() => hint.classList.add('show'));
+      const dismiss = () => { hint.classList.remove('show'); setTimeout(() => hint.remove(), 400); try { localStorage.setItem('os-hint-seen', '1'); } catch (e) {} };
+      setTimeout(dismiss, 6000);
+      hint.addEventListener('click', dismiss);
+    }
+  } catch (e) {}
+
 })();
